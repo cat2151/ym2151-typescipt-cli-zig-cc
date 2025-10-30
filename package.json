@@ -1,5 +1,5 @@
 {
-  "name": "ym2151-typescipt-cli-zig-cc",
+  "name": "ym2151-typescript-cli-zig-cc",
   "version": "1.0.0",
   "description": "YM2151 (Nuked-OPM) 440Hz tone generator using TypeScript and zig cc",
   "main": "dist/phase2/index.js",

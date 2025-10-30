@@ -9,12 +9,19 @@ import * as fs from 'fs';
 export function generate440HzWav(outputPath: string = 'output.wav'): void {
     console.log('Starting YM2151 (Nuked-OPM) 440Hz tone generator...');
     
-    // The executable is in the source directory, not dist
-    const executablePath = path.join(__dirname, '..', '..', 'src', 'phase2', 'opm_generator');
+    // Find the executable - it's in the source directory, not dist
+    // Try multiple locations to be more robust
+    const possiblePaths = [
+        path.join(__dirname, '..', '..', 'src', 'phase2', 'opm_generator'),
+        path.join(__dirname, '..', '..', 'src', 'phase2', 'opm_generator.exe'),
+        path.join(__dirname, 'opm_generator'),
+        path.join(__dirname, 'opm_generator.exe'),
+    ];
     
-    // Check if executable exists
-    if (!fs.existsSync(executablePath)) {
-        throw new Error(`Executable not found: ${executablePath}. Please run 'npm run build' first.`);
+    let executablePath = possiblePaths.find(p => fs.existsSync(p));
+    
+    if (!executablePath) {
+        throw new Error(`Executable not found. Tried: ${possiblePaths.join(', ')}. Please run 'npm run build' first.`);
     }
     
     try {
