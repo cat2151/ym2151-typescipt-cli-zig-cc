@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -25,8 +25,8 @@ export function generate440HzWav(outputPath: string = 'output.wav'): void {
     }
     
     try {
-        // Execute the C program
-        const output = execSync(`"${executablePath}" "${outputPath}"`, {
+        // Execute the C program with proper argument passing (secure against command injection)
+        const output = execFileSync(executablePath, [outputPath], {
             encoding: 'utf-8',
             stdio: 'pipe'
         });
