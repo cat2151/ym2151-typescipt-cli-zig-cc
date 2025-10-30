@@ -1,0 +1,20 @@
+{
+  "name": "ym2151-typescipt-cli-zig-cc",
+  "version": "1.0.0",
+  "description": "YM2151 (Nuked-OPM) 440Hz tone generator using TypeScript and zig cc",
+  "main": "dist/phase2/index.js",
+  "scripts": {
+    "build": "npm run build:native && npm run build:ts",
+    "build:native": "bash src/phase2/build.sh",
+    "build:ts": "tsc",
+    "start": "npm run build && node dist/phase2/index.js",
+    "generate": "node dist/phase2/index.js"
+  },
+  "keywords": ["ym2151", "nuked-opm", "fm-synthesis", "audio", "wav"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^24.9.2",
+    "typescript": "^5.9.3"
+  }
+}

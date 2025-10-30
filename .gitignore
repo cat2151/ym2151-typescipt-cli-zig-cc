@@ -47,6 +47,14 @@ web_modules/
 # TypeScript cache
 *.tsbuildinfo
 
+# Compiled executables
+src/phase2/opm_generator
+src/phase2/opm_generator.exe
+src/phase2/*.o
+
+# Generated WAV files
+*.wav
+
 # Optional npm cache directory
 .npm
 
