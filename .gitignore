@@ -36,6 +36,7 @@ bower_components
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
+build/
 
 # Dependency directories
 node_modules/
@@ -46,11 +47,6 @@ web_modules/
 
 # TypeScript cache
 *.tsbuildinfo
-
-# Compiled executables
-src/phase2/opm_generator
-src/phase2/opm_generator.exe
-src/phase2/*.o
 
 # Generated WAV files
 *.wav

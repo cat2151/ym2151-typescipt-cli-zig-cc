@@ -7,39 +7,40 @@
 - **内容**: Nuked-OPMを使って、440Hz 3秒のWAVファイルを出力
 - **FM音源レジスタwrite後**: 10msのcycle消費を実施
 - **プラットフォーム**: Windows + Node.js
-- **プログラミング言語**: TypeScript + zig cc (Cコンパイラ)
+- **プログラミング言語**: TypeScript + C (Node.js Native Addon)
 
 ## 必要要件
 
 ### Windows環境
 - Node.js (推奨: v18以上)
-- zig (0.11.0以上)
-  - ダウンロード: https://ziglang.org/download/
+- C/C++コンパイラ (以下のいずれか)
+  - Visual Studio Build Tools
+  - または MinGW-w64
 
-### Linuxでテストする場合
+### Linux環境
 - Node.js
-- zig または gcc
+- gcc または clang
+- python3
+- make
 
 ## セットアップ
 
-1. **zig のインストール (Windows)**
-   ```powershell
-   # zigをダウンロードして解凍
-   # 環境変数PATHに追加してください
-   ```
-
-2. **依存関係のインストール**
+1. **依存関係のインストール**
    ```bash
    npm install
    ```
 
-3. **ビルド**
+   このコマンドは以下を自動実行します：
+   - Node.jsネイティブアドオンのビルド (node-gyp)
+   - TypeScriptのコンパイル
+
+2. **手動ビルド（必要に応じて）**
    ```bash
    npm run build
    ```
 
    このコマンドは以下を実行します：
-   - `npm run build:native` - zig ccを使用してC言語プログラムをコンパイル
+   - `npm run build:native` - ネイティブアドオンをビルド
    - `npm run build:ts` - TypeScriptをコンパイル
 
 ## 使用方法
@@ -64,29 +65,19 @@ node dist/phase2/index.js
 node dist/phase2/index.js my_tone.wav
 ```
 
-### 方法3: C実行ファイルを直接実行
-
-```bash
-# Windows
-src\phase2\opm_generator.exe output.wav
-
-# Linux
-./src/phase2/opm_generator output.wav
-```
-
 ## 実装の詳細
 
 ### アーキテクチャ
 
 ```
 src/phase2/
-├── main.c          - Nuked-OPMを使用するCプログラム
+├── addon.c         - Node.jsネイティブアドオン (Nuked-OPMラッパー)
 ├── opm.c           - Nuked-OPMエミュレータコア
 ├── opm.h           - Nuked-OPMヘッダー
-├── index.ts        - TypeScriptインターフェース
-├── build.sh        - Linuxビルドスクリプト
-├── build.bat       - Windowsビルドスクリプト
+├── index.ts        - TypeScriptメインプログラム
 └── README.md       - このファイル
+
+binding.gyp         - node-gypビルド設定
 ```
 
 ### 技術仕様
@@ -99,13 +90,23 @@ src/phase2/
 
 2. **レジスタ書き込み**:
    - 各レジスタ書き込み後、10msの遅延を実装
-   - `sleep_ms(10)` 関数で実装
+   - ネイティブアドオン内で `sleep_ms(10)` 関数で実装
 
 3. **WAVファイル形式**:
    - フォーマット: PCM
    - チャンネル: ステレオ (2)
    - ビット深度: 16-bit
    - 長さ: 3秒
+
+### ネイティブアドオンAPI
+
+TypeScriptから以下の関数を呼び出せます：
+
+- `initChip()` - OPMチップを初期化
+- `resetChip()` - チップをリセット
+- `writeRegister(address, data)` - レジスタに書き込み (10ms遅延あり)
+- `clockChip()` - チップを1サンプル分クロックして音声データを取得
+- `cleanupChip()` - チップをクリーンアップ
 
 ### Nuked-OPMについて
 
@@ -116,21 +117,30 @@ Nuked-OPMは、Yamaha YM2151 (OPM)チップのサイクル正確なエミュレ�
 
 ## トラブルシューティング
 
-### ビルドエラー: "zig not found"
+### ビルドエラー: "Python not found"
 
 **Windows**: 
-- zigをダウンロードしてインストール: https://ziglang.org/download/
+- Python 3をインストール: https://www.python.org/downloads/
 - 環境変数PATHに追加
 
 **Linux**:
-- 代替としてgccが自動的に使用されます
+- `sudo apt-get install python3` でインストール
 
-### 実行エラー: "Executable not found"
+### ビルドエラー: "C compiler not found"
+
+**Windows**: 
+- Visual Studio Build Toolsをインストール
+- または MinGW-w64をインストール
+
+**Linux**:
+- `sudo apt-get install build-essential` でインストール
+
+### 実行エラー: "Cannot find module 'nuked_opm_native.node'"
 
 ```bash
-npm run build
+npm install
 ```
-を実行して、C実行ファイルをビルドしてください。
+を実行して、ネイティブアドオンをビルドしてください。
 
 ### 生成されたWAVファイルが再生できない
 
