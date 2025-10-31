@@ -89,8 +89,8 @@ binding.gyp         - node-gypビルド設定
    - FNUM: 290
 
 2. **レジスタ書き込み**:
-   - 各レジスタ書き込み後、10msの遅延を実装
-   - ネイティブアドオン内で `sleep_ms(10)` 関数で実装
+   - 各レジスタ書き込み後、10msのcycle消費を実装
+   - ネイティブアドオン内でOPM_Clockを約35,795回呼び出し (3.579545MHz × 10ms)
 
 3. **WAVファイル形式**:
    - フォーマット: PCM
@@ -104,7 +104,7 @@ TypeScriptから以下の関数を呼び出せます：
 
 - `initChip()` - OPMチップを初期化
 - `resetChip()` - チップをリセット
-- `writeRegister(address, data)` - レジスタに書き込み (10ms遅延あり)
+- `writeRegister(address, data)` - レジスタに書き込み (10ms分のcycle消費あり)
 - `clockChip()` - チップを1サンプル分クロックして音声データを取得
 - `cleanupChip()` - チップをクリーンアップ
 

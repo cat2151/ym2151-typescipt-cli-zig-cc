@@ -4,17 +4,9 @@
 #include <stdio.h>
 #include "opm.h"
 
-#ifdef _WIN32
-#include <windows.h>
-void sleep_ms(int milliseconds) {
-    Sleep(milliseconds);
-}
-#else
-#include <unistd.h>
-void sleep_ms(int milliseconds) {
-    usleep(milliseconds * 1000);
-}
-#endif
+// YM2151 clock frequency: 3.579545 MHz
+// For 10ms delay: 3579545 * 0.01 = 35795.45 cycles
+#define CYCLES_FOR_10MS 35795
 
 // Global chip instance (one per module instance)
 static opm_t* chip = NULL;
@@ -78,8 +70,13 @@ napi_value WriteRegister(napi_env env, napi_callback_info info) {
     // Write data
     OPM_Write(chip, 1, (uint8_t)data);
     
-    // Wait 10ms after register write (as required)
-    sleep_ms(10);
+    // Consume 10ms of cycles after register write (as required)
+    // Clock the chip for the appropriate number of cycles
+    int32_t dummy_output[2];
+    uint8_t dummy_sh1, dummy_sh2, dummy_so;
+    for (int i = 0; i < CYCLES_FOR_10MS; i++) {
+        OPM_Clock(chip, dummy_output, &dummy_sh1, &dummy_sh2, &dummy_so);
+    }
     
     napi_value result;
     status = napi_get_undefined(env, &result);
@@ -129,7 +126,13 @@ napi_value ResetChip(napi_env env, napi_callback_info info) {
     }
     
     OPM_Reset(chip);
-    sleep_ms(10);
+    
+    // Consume 10ms of cycles after reset
+    int32_t dummy_output[2];
+    uint8_t dummy_sh1, dummy_sh2, dummy_so;
+    for (int i = 0; i < CYCLES_FOR_10MS; i++) {
+        OPM_Clock(chip, dummy_output, &dummy_sh1, &dummy_sh2, &dummy_so);
+    }
     
     napi_value result;
     status = napi_get_undefined(env, &result);
