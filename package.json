@@ -9,7 +9,7 @@
     "build:ts": "tsc",
     "start": "npm run build && node dist/phase2/index.js",
     "generate": "node dist/phase2/index.js",
-    "install": "node-gyp rebuild"
+    "postinstall": "node-gyp rebuild"
   },
   "keywords": [
     "ym2151",
