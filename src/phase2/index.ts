@@ -1,8 +1,12 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-// Import the native addon
-const addon = require('../../build/Release/nuked_opm_native.node');
+// Import the native addon using a flexible path resolution
+const nativeAddonPath = path.resolve(__dirname, '../../build/Release/nuked_opm_native.node');
+if (!fs.existsSync(nativeAddonPath)) {
+    throw new Error(`Native addon not found at ${nativeAddonPath}`);
+}
+const addon = require(nativeAddonPath);
 
 // WAV file header structure
 interface WavHeader {
